@@ -1,0 +1,41 @@
+# ==========================================
+# GitHub Actions 自动部署配置
+# 功能：当代码推送到 gh-pages 分支时，自动构建并部署到 GitHub Pages
+# 触发条件：推送到 gh-pages 分支或手动触发 (workflow_dispatch)
+# ==========================================
+
+name: Deploy Hexo to GitHub Pages
+
+on:
+  push:
+    branches:
+      - gh-pages  # 源代码分支
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Generate static files
+      run: npx hexo generate
+      
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./public
+        branch: gh-pages  # 部署分支
+        cname: 'www.zwm_web.com'  # 如果有自定义域名，填写这里
